@@ -44,4 +44,12 @@ public final class Coordinates implements Serializable {
     public double ySquared(){return y*y;}
     public double xySquared(){return xSquared()+ySquared();}
 
+    public void normalize() {
+        double length = Math.sqrt(xySquared());
+        if(length > 0) {
+            this.x = this.x / length;
+            this.y = this.y / length;
+        }
+    }
+
 }

@@ -16,14 +16,14 @@ public class Client extends Thread {
 
     /** Server Members **/
     private final int PORT = 2000;
-    private final String IP = "192.168.1.73";
+    private final String IP = "10.22.10.241";
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
     private boolean GUI = false;
-    private ClientGUI clientGUI = null;
+    private Project.ClientGUI clientGUI = null;
 
-    public void sendData(Data data) throws IOException {
+    public void sendData(Project.Data data) throws IOException {
         oos.writeObject(data);
         oos.reset();
     }

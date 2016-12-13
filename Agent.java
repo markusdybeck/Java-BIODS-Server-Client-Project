@@ -59,16 +59,22 @@ public class Agent implements Serializable {
 
 
         /* Integers setting the weight of a function, number between -1 -> 1 */
-        int f1, f2, f3;
-        f1 = f2 = f3 = 1;
+        double f1, f2, f3, speed;
+        f1 = 0.5;
+        f2 = 1.2;
+        f3 = 1;
+        speed = 2;
 
         /* Calculate the different rules */
         if(a.agents != null && a.agents.size() > 0) {
             v1 = cohesion(a);
             v2 = separation(a);
             v3 = alignment(a);
-            a.velocity.add((v1.x * f1 + v2.x * f2 + v3.x * f3)/(a.agents.size()+1), (v1.y * f1 + v2.y * f2 + v3.y * f3)/(a.agents.size()+1));
+            a.velocity.add((v1.x * f1 + v2.x * f2 + v3.x * f3), (v1.y * f1 + v2.y * f2 + v3.y * f3));
+            a.velocity.set(a.velocity.x*speed, a.velocity.y*speed);
         }
+
+        a.velocity.normalize();
 
         a.pos.add(a.velocity.x, a.velocity.y);
 
@@ -95,18 +101,15 @@ public class Agent implements Serializable {
         coord.x = coord.x / (self.agents.size());
         coord.y = coord.y / (self.agents.size());
 
+        coord.add(-self.pos.x, -self.pos.y);
 
-        /* Steer in direction 1,1 if deadlock */
-        if(coord.isZero()) {
-            coord.set(1,1);
-            System.out.println("DEADLOCK in Cohesion");
-        }
 
         double maxDistanceToNeighbour = 75;
-        coord.set(coord.x/maxDistanceToNeighbour,coord.y/maxDistanceToNeighbour);
+        //coord.set(coord.x/maxDistanceToNeighbour,coord.y/maxDistanceToNeighbour);
 
         System.out.println("Cohesion: " + coord.x + " :: " + coord.y);
 
+        coord.normalize();
         return coord;
     }
 
@@ -115,7 +118,7 @@ public class Agent implements Serializable {
         Coordinates coord = new Coordinates();
 
         double standardShape = 5.0;
-        double unit = standardShape + 2.0; // This should be the same as our shape radius plus minimum space
+        double unit = standardShape + 5.0; // This should be the same as our shape radius plus minimum space
         double shapeRed = standardShape*standardShape;
         double radius = unit * unit;
 
@@ -123,10 +126,14 @@ public class Agent implements Serializable {
             if(a != self) {
 
                 if(a.pos.xySquared()-shapeRed <= radius) {
-                    coord.add(-a.pos.x,-a.pos.y);
+                    coord.add(a.pos.x-self.pos.x,a.pos.y-a.pos.y);
                 }
             }
         }
+
+        coord.set(coord.x/agents.size(), coord.y/agents.size());
+        coord.set(coord.x*-1, coord.y*-1);
+        coord.normalize();
         System.out.println("Separation: " + coord.x + " :: " + coord.y);
         return coord;
     }
@@ -142,7 +149,10 @@ public class Agent implements Serializable {
         }
 
         coord.set(coord.x/self.agents.size(),coord.y/self.agents.size());
-        coord.set((coord.x - self.velocity.x) / 2, (coord.y - self.velocity.y) / 2);
+        coord.normalize();
+        //coord.set((coord.x - self.velocity.x) / 20, (coord.y - self.velocity.y) / 20);
+
+
         System.out.println("Alignment: " + coord.x + " :: " + coord.y);
         return coord;
     }

@@ -20,7 +20,7 @@ import java.math.RoundingMode;
 public class ServerGUI extends Application {
 
     private static Group root;
-    private static Stage primaryStage;
+    public static Stage primaryStage;
     private static int windowWidth = 500;
     private static int windowHeight = 500;
 

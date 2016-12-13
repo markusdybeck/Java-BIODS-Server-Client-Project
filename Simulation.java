@@ -69,6 +69,20 @@ public class Simulation extends Thread {
                    ((Agent)pair.getValue()).agents = ((ClientHandler)pair.getKey()).checkNeighbours();
                     System.out.println("neighbours checked for clientThread" +   ((ClientHandler)pair.getKey()).clientNumber + " size: " +  ((Agent)pair.getValue()).agents.size() );
 
+                    /* Check screen coordinates */
+                    if(SimulationServer.serverGUI.primaryStage.getWidth() < ((Agent)pair.getValue()).pos.x) {
+                        ((Agent)pair.getValue()).pos.x = 0;
+                    } else if(0 > ((Agent)pair.getValue()).pos.x) {
+                        ((Agent)pair.getValue()).pos.x = SimulationServer.serverGUI.primaryStage.getWidth();
+                    }
+
+                    if(SimulationServer.serverGUI.primaryStage.getHeight() < ((Agent)pair.getValue()).pos.y) {
+                        ((Agent)pair.getValue()).pos.y = 0;
+                    } else if(0 > ((Agent)pair.getValue()).pos.y) {
+                        ((Agent)pair.getValue()).pos.y = SimulationServer.serverGUI.primaryStage.getHeight();
+                    }
+
+
                     /* Update ServerGUI */
                     SimulationServer.serverGUI.addMembers( ((Agent)pair.getValue()));
                 }
