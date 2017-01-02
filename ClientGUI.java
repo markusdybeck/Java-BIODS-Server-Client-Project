@@ -25,6 +25,7 @@ import java.math.RoundingMode;
 /**
  * Created by Markus Dybeck on 2016-11-29.
  **/
+
 public class ClientGUI extends Application {
 
     private static Group root;
@@ -103,7 +104,6 @@ public class ClientGUI extends Application {
             }
         }
     }
-
 
     @Override
     public void start(Stage primaryStage) throws IOException, ClassNotFoundException {
