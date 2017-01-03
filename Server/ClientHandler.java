@@ -1,4 +1,8 @@
-package Project;
+package Project.Server;
+
+import Project.Global.Agent;
+import Project.Global.Data;
+import Project.Server.SimulationServer;
 
 import java.io.*;
 import java.net.Socket;
@@ -7,8 +11,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created by Markus Dybeck on 2016-12-02.
- **/
+ * The ClientHandler
+ *
+ * @author Markus Dybeck
+ * @since 2016-12-02
+ * @version 1.0
+ */
+
 public class ClientHandler extends Thread {
 
     private static int numberOfClients = 0;
@@ -52,9 +61,14 @@ public class ClientHandler extends Thread {
     }
 
 
-    public void sendData(Data obj) throws IOException {
-        oos.writeObject(obj);
-        oos.reset();
+    public void sendData(Data obj){
+        try {
+            oos.writeObject(obj);
+            oos.reset();
+        } catch (IOException e) {
+            System.out.println("Exception, socket probably closed");
+        }
+
     }
 
     @Override
@@ -94,6 +108,7 @@ public class ClientHandler extends Thread {
             try{
                 socket.close();
                 System.out.println("Closed socket for client: " + clientNumber);
+                SimulationServer.simulation.clientSize--;
             }
             catch(IOException e){
                 System.out.println("Client thread " + clientNumber + ": Socket not closed!");
@@ -102,7 +117,7 @@ public class ClientHandler extends Thread {
             // Remove client from list.
             SimulationServer.simulation.getClientHashMap().remove(this,thisAgent);
             numberOfClients--;
-            SimulationServer.simulation.setClientSize(numberOfClients);
+            //4SimulationServer.simulation.setClientSize(numberOfClients);
             System.out.println("Connected client after closing one: " + SimulationServer.simulation.getClientHashMap().size());
         }
 
@@ -128,18 +143,18 @@ public class ClientHandler extends Thread {
         while (it.hasNext())
         {
             Map.Entry pair = (Map.Entry) it.next();
-            Agent neighbour = ((Agent)pair.getValue());
+            Agent neighbor = ((Agent)pair.getValue());
 
-            if(neighbour != thisAgent) {
-                /* Check if neighbour is in reasonable distance */
-                double xPos = neighbour.pos.x-thisAgent.pos.x;
-                double yPos = neighbour.pos.y-thisAgent.pos.y;
+            if(neighbor != thisAgent) {
+                /* Check if neighbor is in reasonable distance */
+                double xPos = neighbor.pos.x-thisAgent.pos.x;
+                double yPos = neighbor.pos.y-thisAgent.pos.y;
                 double xPosSquared = xPos * xPos;
                 double yPosSquared = yPos * yPos;
 
                 if((xPosSquared + yPosSquared) <= radius)
                 {
-                    neighbourList.add(neighbour);
+                    neighbourList.add(neighbor);
                 }
             }
 

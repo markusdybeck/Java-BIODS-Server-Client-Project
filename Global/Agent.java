@@ -1,8 +1,18 @@
-package Project;
+package Project.Global;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
+
+
+/**
+ * The Agent class creates an agent, e.g a bird in a flock.
+ * Agent class got methods to calculate the agents position and velocity.
+ *
+ * @author Markus Dybeck
+ * @since 2016-12-06
+ * @version 1.0
+ */
 
 public class Agent implements Serializable {
 
@@ -20,25 +30,20 @@ public class Agent implements Serializable {
 
 
     public void setSight(int s){this.sight = s;}
-    public int getSight(){return this.sight;}
 
-
-    /** Balance up our agent so its the center of the environment, relative to its neighbours **/
+    /** Balance up our agent so its the center of the environment, relative to its neighbors **/
     private void balance() {
 
         Agent a = this;
 
         if(a.agents != null) {
-            for (Agent neighbour : a.agents
+            for (Agent neighbor : a.agents
                     ) {
-                neighbour.pos.add(-a.pos.x,-a.pos.y);
-//                neighbour.velocity.add(-a.velocity.x,-a.velocity.y);
+                neighbor.pos.add(-a.pos.x,-a.pos.y);
             }
         }
-
         /* Set default values */
         a.pos.set(0,0);
-//        a.velocity.set(0,0);
     }
 
 
@@ -58,38 +63,32 @@ public class Agent implements Serializable {
         Coordinates v1,v2,v3;
 
 
-        /* Integers setting the weight of a function, number between -1 -> 1 */
-        double f1, f2, f3, speed;
-        f1 = 0.5;
-        f2 = 1.2;
+        /* Integers setting the weight of a function */
+        double f1, f2, f3, max_speed;
+        f1 = 1;
+        f2 = 2;
         f3 = 1;
-        speed = 2;
+        max_speed = 0.15;
 
         /* Calculate the different rules */
         if(a.agents != null && a.agents.size() > 0) {
-            v1 = cohesion(a);
+            v1 = cohesion(a, max_speed);
             v2 = separation(a);
-            v3 = alignment(a);
+            v3 = alignment(a, max_speed);
             a.velocity.add((v1.x * f1 + v2.x * f2 + v3.x * f3), (v1.y * f1 + v2.y * f2 + v3.y * f3));
-            a.velocity.set(a.velocity.x*speed, a.velocity.y*speed);
         }
 
         a.velocity.normalize();
 
         a.pos.add(a.velocity.x, a.velocity.y);
 
-
         if(a.velocity.isZero()) {
             a.pos.add(oldVelocity.x,oldVelocity.y);
         }
-//        System.out.println("Vel: " + a.velocity.x + " :: " + a.velocity.y);
-
     }
 
-    /** Calculate center of the mass of neighbour agents, not including self
-     **
-     * **/
-    private Coordinates cohesion(Agent self) {
+    /** Calculate center of the mass of neighbor agents, not including self **/
+    private Coordinates cohesion(Agent self, double max_speed) {
         Coordinates coord = new Coordinates();
 
         for (Agent a : self.agents) {
@@ -98,18 +97,23 @@ public class Agent implements Serializable {
             }
         }
 
-        coord.x = coord.x / (self.agents.size());
-        coord.y = coord.y / (self.agents.size());
+        coord.divideAll(self.agents.size());
 
-        coord.add(-self.pos.x, -self.pos.y);
+        /*Ease it out*/
+        if(coord.length() > 0 ) {
+            coord.normalize();
 
+            coord.multiplyXY(max_speed);
+            coord.add(-self.velocity.x, -self.velocity.y);
+            if(coord.length() > max_speed) {
+                coord.normalize();
+                coord.multiplyXY(max_speed);
+            }
 
-        double maxDistanceToNeighbour = 75;
-        //coord.set(coord.x/maxDistanceToNeighbour,coord.y/maxDistanceToNeighbour);
+        }
+
 
         System.out.println("Cohesion: " + coord.x + " :: " + coord.y);
-
-        coord.normalize();
         return coord;
     }
 
@@ -118,28 +122,24 @@ public class Agent implements Serializable {
         Coordinates coord = new Coordinates();
 
         double standardShape = 5.0;
-        double unit = standardShape + 5.0; // This should be the same as our shape radius plus minimum space
-        double shapeRed = standardShape*standardShape;
-        double radius = unit * unit;
 
         for (Agent a : self.agents) {
             if(a != self) {
-
-                if(a.pos.xySquared()-shapeRed <= radius) {
-                    coord.add(a.pos.x-self.pos.x,a.pos.y-a.pos.y);
+                if(a.pos.length() <= 15) {
+                   System.out.println("Length: " + a.pos.length());
+                    a.pos.normalize();
+                    a.pos.divideAll(a.pos.length());
+                    coord.add(-(a.pos.x),-(a.pos.y));
                 }
             }
         }
-
-        coord.set(coord.x/agents.size(), coord.y/agents.size());
-        coord.set(coord.x*-1, coord.y*-1);
-        coord.normalize();
+        coord.divideAll(agents.size());
         System.out.println("Separation: " + coord.x + " :: " + coord.y);
         return coord;
     }
 
     /** Match velocity with near agents, not including self **/
-    private Coordinates alignment(Agent self) {
+    private Coordinates alignment(Agent self, double max_speed) {
         Coordinates coord = new Coordinates();
 
         for (Agent a : self.agents) {
@@ -149,10 +149,11 @@ public class Agent implements Serializable {
         }
 
         coord.set(coord.x/self.agents.size(),coord.y/self.agents.size());
-        coord.normalize();
-        //coord.set((coord.x - self.velocity.x) / 20, (coord.y - self.velocity.y) / 20);
 
-
+        if(coord.length() > max_speed) {
+            coord.normalize();
+            coord.multiplyXY(max_speed);
+        }
         System.out.println("Alignment: " + coord.x + " :: " + coord.y);
         return coord;
     }

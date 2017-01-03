@@ -1,12 +1,9 @@
-package Project;
+package Project.Client;
 
+import Project.Global.Agent;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -15,16 +12,21 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 
-import java.awt.*;
-import java.awt.geom.Line2D;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 
 /**
- * Created by Markus Dybeck on 2016-11-29.
- **/
+ * The ClientGUI class creates a simple JavaFX application
+ * and display a agent on it, the agents is centralized and displays
+ * its direction and the neighbours of the agent.
+ *
+ * @author Markus Dybeck
+ * @since 2016-11-29
+ * @version 1.0
+ */
+
 
 public class ClientGUI extends Application {
 
@@ -88,17 +90,17 @@ public class ClientGUI extends Application {
 
         /* Show all neighbours */
         if(a.agents != null) {
-            for (Agent neighbour : a.agents ) {
+            for (Agent neighbor : a.agents ) {
 
-                /* Calculate the neighbour positions relative our centered host */
-                double xPos = (neighbour.pos.x - a.pos.x) + primaryStage.getWidth() / 2;
-                double yPos = (neighbour.pos.y - a.pos.y) + primaryStage.getHeight() / 2;
+                /* Calculate the neighbor positions relative our centered host */
+                double xPos = (neighbor.pos.x - a.pos.x) + primaryStage.getWidth() / 2;
+                double yPos = (neighbor.pos.y - a.pos.y) + primaryStage.getHeight() / 2;
                 Circle c = new Circle(xPos, yPos, cr, seoncdaryColor);
 
                 /* Some debugging prints */
                 System.out.println("Neighbour in ClientGUI: " + xPos + " :: " + yPos);
-//                System.out.println("Neighbour distance: " + (neighbour.pos.x-a.pos.x) + " :: " + (neighbour.pos.y-a.pos.y) );
-//                System.out.println("Neighbour : " + (neighbour.pos.x) + " :: " + (neighbour.pos.y) + " Self: " + a.pos.x + " :: " + a.pos.y );
+//                System.out.println("Neighbour distance: " + (neighbor.pos.x-a.pos.x) + " :: " + (neighbor.pos.y-a.pos.y) );
+//                System.out.println("Neighbour : " + (neighbor.pos.x) + " :: " + (neighbor.pos.y) + " Self: " + a.pos.x + " :: " + a.pos.y );
 
                 root.getChildren().add(c);
             }
@@ -109,7 +111,7 @@ public class ClientGUI extends Application {
     public void start(Stage primaryStage) throws IOException, ClassNotFoundException {
         this.primaryStage = primaryStage;
 
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("ClientGUI, Boid is my name");
 
         this.root = new Group();
 

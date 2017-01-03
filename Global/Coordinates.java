@@ -1,11 +1,17 @@
-package Project;
+package Project.Global;
 
 import java.io.Serializable;
 
 /**
- * Represent the coordinates our agent & non-agent can have.
- * Ex: Position and Direction (Velocity).
- * **/
+ * The Coordinates class represent values and methods for an agent
+ * e.g Velocity or Position.
+ * Implements class Serializable so it can be sent with ObjectStreamer.
+ *
+ * @author Markus Dybeck
+ * @since 2016-12-06
+ * @version 1.0
+ */
+
 public final class Coordinates implements Serializable {
     public double x = 0; // Position x value in 2D map.
     public double y = 0; // Position y value in 2D map.
@@ -28,9 +34,9 @@ public final class Coordinates implements Serializable {
         this.y += y;
     }
 
-    public void times(double x, double y) {
-        this.x *= x;
-        this.y *= y;
+    public void multiplyXY(double m) {
+        this.x *= m;
+        this.y *= m;
     }
 
     /* Calculates the angle v between our coordinates */
@@ -43,9 +49,16 @@ public final class Coordinates implements Serializable {
     public double xSquared(){return x*x;}
     public double ySquared(){return y*y;}
     public double xySquared(){return xSquared()+ySquared();}
+    public double length(){return Math.sqrt(xySquared());}
+    public void divideAll(double d) {
+        if(d > 0) {
+            this.x/=d;
+            this.y/=d;
+        }
+    }
 
     public void normalize() {
-        double length = Math.sqrt(xySquared());
+        double length = this.length();
         if(length > 0) {
             this.x = this.x / length;
             this.y = this.y / length;

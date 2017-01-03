@@ -1,40 +1,53 @@
-package Project;
+package Project.Client;
 
-import javafx.application.Platform;
+import Project.Global.Agent;
+import Project.Global.Data;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /**
- * Created by Markus on 2016-12-09.
+ * The Client class creates a socket and connect to a server.
+ * The class can create instances of agents, and represent them in a GUI, clientGUI.
+ * Handles incoming data from the server.
+ *
+ * @author Markus Dybeck
+ * @since 2016-12-09
+ * @version 1.0
  */
+
 public class Client extends Thread {
 
-    /** Server Members **/
-    private final int PORT = 2000;
-    private final String IP = "10.22.10.241";
+    /* Server Members */
+    private int PORT = 2000;
+    private String IP = "192.18.1.73";
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
     private boolean GUI = false;
-    private Project.ClientGUI clientGUI = null;
+    private ClientGUI clientGUI = null;
 
-    public void sendData(Project.Data data) throws IOException {
+    public void sendData(Data data) throws IOException {
         oos.writeObject(data);
         oos.reset();
     }
 
-    public Client() {
+    public Client(String ip, int port ) {
+        this.IP = ip;
+        this.PORT = port;
         start();
     }
 
-    /** Start a client with GUI repesentation **/
-    public Client(boolean startGUI) {
-
+    /** Start a client with GUI representation **/
+    public Client(String ip, int port, boolean startGUI) {
+        this.IP = ip;
+        this.PORT = port;
         if(startGUI) {
             this.GUI = true;
             String[] args = {""};
@@ -46,19 +59,20 @@ public class Client extends Thread {
             };
             one.start();
         }
-
         start();
-
     }
 
 
+    /**
+     * The run method create the socket instance,
+     * stands by and wait for incoming data and then
+     * updates the clientGUI.
+     */
     @Override
     public void run() {
         try {
-
             /* Set up socket/streams */
             InetAddress addr = InetAddress.getByName(IP);
-
             Socket socket = new Socket(addr, PORT);
 
              /* Initialize Streams */
@@ -75,7 +89,6 @@ public class Client extends Thread {
                 Thread.sleep(200);
 
                 /* Wait for message */
-
                 Data data = (Data)ois.readObject();
 
                 /* Check object type */
@@ -86,7 +99,7 @@ public class Client extends Thread {
                     /* Change the GUI representation */
                     if(this.GUI && agent!= null) {
 
-                        /* Make deep copy of agent positions and neighbours */
+                        /* Make deep copy of agent positions and neighbors */
                         Agent agent1 = new Agent();
                         agent1.pos.set(agent.pos.x,agent.pos.y);
                         agent1.velocity.set(agent.velocity.x,agent.velocity.y);
@@ -102,7 +115,7 @@ public class Client extends Thread {
                             }
                         }
 
-                        System.out.println("ClientGUI neighbours: " + agent1.agents.size());
+                        System.out.println("ClientGUI neighbors: " + agent1.agents.size());
 
                         /* Update client screen */
                         clientGUI.updateScreen(agent1);
@@ -121,11 +134,22 @@ public class Client extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }  finally {
+            try {
+                oos.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
 
     } /* End Run Method */
+
+    /** Simple main method to start one instance of Client class */
+    public static void main (String[] args) throws UnknownHostException {
+        new Client(Inet4Address.getLocalHost().getHostAddress(),2000, true);
+    }
 
 }

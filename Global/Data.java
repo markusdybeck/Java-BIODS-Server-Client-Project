@@ -1,10 +1,15 @@
-package Project;
+package Project.Global;
 
 import java.io.Serializable;
 
 /**
- * Created by Markus on 2016-12-09.
+ * The Data class simply is a class for simplifying message parsing.
+ *
+ * @author Markus Dybeck
+ * @since 2016-12-09
+ * @version 1.0
  */
+
 public class Data implements Serializable {
 
     private String action;
