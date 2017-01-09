@@ -134,7 +134,7 @@ public class ClientHandler extends Thread {
      *  are inside/on the given radius, instead of given points.
      *  Circle equation: x^2 + y^2 <= r^2
      * **/
-    public ArrayList<Agent> checkNeighbours() {
+    public ArrayList<Agent> checkNeighbors() {
         ArrayList<Agent> neighbourList = new ArrayList<Agent>();
         double unit = 75.0;
         double radius = unit * unit;

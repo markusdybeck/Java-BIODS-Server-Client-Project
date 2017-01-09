@@ -74,7 +74,7 @@ public class Simulation extends Thread {
                     it = clients.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry pair = (Map.Entry) it.next();
-                        ((Agent) pair.getValue()).agents = ((ClientHandler) pair.getKey()).checkNeighbours();
+                        ((Agent) pair.getValue()).agents = ((ClientHandler) pair.getKey()).checkNeighbors();
                         System.out.println("neighbors checked for clientThread" + ((ClientHandler) pair.getKey()).clientNumber + " size: " + ((Agent) pair.getValue()).agents.size());
 
                         /* Check screen coordinates */
